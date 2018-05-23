@@ -10,6 +10,7 @@
 
     <uses-permission-sdk-23 android:name="android.permission.CAMERA" />
     <uses-permission-sdk-23 android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
 
 
@@ -26,7 +27,7 @@
         <activity android:name=".login"></activity>
         <activity android:name=".LoginActivity"></activity>
         <activity
-            android:name=".TutorielActivity"
+            android:name=".Home2"
             android:label="@string/title_activity_login" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

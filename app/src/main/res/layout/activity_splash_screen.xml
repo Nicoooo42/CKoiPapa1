@@ -22,6 +22,6 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:src="@drawable/logo_CKOIPAPA" />
+        android:src="@drawable/ckoipapa" />
 
 </RelativeLayout>

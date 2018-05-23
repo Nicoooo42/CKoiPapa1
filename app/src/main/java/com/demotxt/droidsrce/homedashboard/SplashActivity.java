@@ -26,7 +26,7 @@ public class SplashActivity extends Activity{
 
         imageViewSplash = (ImageView) findViewById(R.id.imageViewSplash);
 
-        txtAppName = (TextView) findViewById(R.id.txtAppName);
+        //txtAppName = (TextView) findViewById(R.id.txtAppName);
         relativeLayout = (RelativeLayout) findViewById(R.id.relative);
 
         startAnimations();
