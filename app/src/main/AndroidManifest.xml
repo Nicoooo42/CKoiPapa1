@@ -21,13 +21,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Home"></activity>
-        <activity android:name=".ae"/>
-        >
+        <activity android:name=".Home2"></activity>
+        <activity android:name=".Object"></activity>
+        <activity android:name=".ae"></activity>
+
         <activity android:name=".login"></activity>
+        <activity android:name=".Home"></activity>
+        <activity android:name=".CameraActivity"></activity>
         <activity android:name=".LoginActivity"></activity>
+
         <activity
-            android:name=".Home2"
+            android:name=".SplashActivity"
             android:label="@string/title_activity_login" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

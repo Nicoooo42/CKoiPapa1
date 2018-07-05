@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,19 +11,18 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:background="@color/darkblue"
+        android:layout_height="311dp"
+        android:background="#FFFFC107"
         android:orientation="vertical"
         android:padding="50dp"
 
         >
 
-        <TextView
-            android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="CKoiPapa"
-            android:textColor="#fff"
-            android:textSize="40sp" />
+            app:srcCompat="@drawable/ckoipapa" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -44,7 +44,7 @@
 
         <EditText
 
-            android:id="@+id/editText"
+            android:id="@+id/editEmail"
             android:layout_width="320dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -53,6 +53,7 @@
             android:hint="Email" />
 
         <EditText
+            android:id="@+id/editPassword"
             android:layout_width="320dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -66,9 +67,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:background="@drawable/edittextstyle"
-            android:drawableRight="@drawable/ic_attach_money_black_24dp"
             android:foreground="?android:attr/selectableItemBackground"
-            android:text="Connection"
+            android:text="Connexion"
             android:textColor="#fff" />
 
     </LinearLayout>

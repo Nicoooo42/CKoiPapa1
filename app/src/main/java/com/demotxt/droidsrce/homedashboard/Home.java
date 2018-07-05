@@ -10,7 +10,8 @@ import android.view.ViewAnimationUtils;
 import android.widget.LinearLayout;
 
 public class Home extends AppCompatActivity {
-CardView mycard ;
+    public final static String AGE = "com.demotxt.droidsrce.homedashboard.AGE";
+    CardView mycard ;
     Intent i ;
     LinearLayout ll;
     @Override
@@ -26,6 +27,7 @@ CardView mycard ;
             public void onClick(View v) {
 
                 Intent camera = new Intent(Home.this, CameraActivity.class);
+                camera.putExtra(AGE,"test_value");
 
                 // Puis on lance l'intent !
                 startActivity(camera);

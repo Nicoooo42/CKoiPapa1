@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -15,7 +16,7 @@ import android.widget.TextView;
 public class SplashActivity extends Activity{
 
     ImageView imageViewSplash;
-    TextView txtAppName;
+    TextView txtAppName, textViewSplash;
     RelativeLayout relativeLayout;
     Thread SplashThread;
 
@@ -24,48 +25,44 @@ public class SplashActivity extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
 
-        imageViewSplash = (ImageView) findViewById(R.id.imageViewSplash);
-
-        //txtAppName = (TextView) findViewById(R.id.txtAppName);
-        relativeLayout = (RelativeLayout) findViewById(R.id.relative);
+        imageViewSplash = (ImageView ) findViewById(R.id.imageViewSplash2);
+        textViewSplash = (TextView ) findViewById(R.id.textViewSplash);
 
         startAnimations();
     }
 
     private void startAnimations() {
 
+        Animation animation1 = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.translate);
+        imageViewSplash.startAnimation(animation1);
 
-        Animation translate = AnimationUtils.loadAnimation(this, R.anim.translate);
+        textViewSplash.setText("Designed by Lamanna Nicolas");
 
-
-        translate.reset();
-        relativeLayout.clearAnimation();
-
-
-        txtAppName.startAnimation(translate);
         SplashThread = new Thread(){
             @Override
             public void run() {
                 super.run();
 
                 int waited = 0;
-                while (waited < 3500) {
+                while (waited < 5000) {
                     try {
                         sleep(100);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    if (waited > 2000)
-                        imageViewSplash.setImageResource(R.drawable.fruit);
                     waited += 100;
                 }
-
                 SplashActivity.this.finish();
+
+
+
+
                 Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 startActivity(intent);
             }
         };
+
         SplashThread.start();
     }
 }

@@ -1,8 +1,10 @@
 package com.demotxt.droidsrce.homedashboard;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import android.Manifest;
 import android.app.Activity;
@@ -22,13 +24,32 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.demotxt.droidsrce.homedashboard.Model.Categorie;
+import com.google.gson.Gson;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 
 public class CameraActivity extends AppCompatActivity {
 
     private Button takePictureButton;
-    private ImageView imageView;
+    private ImageView imageView,imageView2;
     private Uri file;
+    private TextView text;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +58,15 @@ public class CameraActivity extends AppCompatActivity {
 
         takePictureButton = (Button) findViewById(R.id.button_image);
         imageView = (ImageView) findViewById(R.id.imageview);
+        imageView2 = (ImageView) findViewById(R.id.person_photo);
+        text = (TextView) findViewById(R.id.person_age);
+
+        Intent i = getIntent();
+
+        // Puis on récupère l'âge donné dans l'autre activité, ou 0 si cet extra n'est pas dans l'intent
+        String age = i.getStringExtra(Home.AGE);
+        Log.d("CameraDemo string", age);
+
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             takePictureButton.setEnabled(false);
@@ -86,8 +116,62 @@ public class CameraActivity extends AppCompatActivity {
         if (requestCode == 100) {
             if (resultCode == RESULT_OK) {
                 imageView.setImageURI(file);
+
+                File videoFile = new File(file.getPath());
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl("http://192.168.0.23:8080/")
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+
+
+                RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpg"), videoFile);
+
+                MultipartBody.Part body = MultipartBody.Part.createFormData("image", "image.jpg", requestFile);
+
+                Log.d("onResponse", videoFile.getName());
+
+                RetrofitInterface retrofitInterface = retrofit.create(RetrofitInterface.class);
+
+                Call<String> call =  retrofitInterface.uploadImage(body);
+
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, retrofit2.Response<String> response) {
+
+                        try {
+
+                            Log.d("onResponse", "cool");
+
+
+
+                        } catch (Exception e) {
+                            Log.d("onResponse", "marche pas");
+                            e.printStackTrace();
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        Log.d("onFailure", t.toString());
+                    }
+
+
+                });
+
+
+
+
             }
         }
         setContentView(R.layout.activity_objet);
+
+        Intent camera = new Intent(CameraActivity.this, Object.class);
+
+        // Puis on lance l'intent !
+        startActivity(camera);
+
     }
 }

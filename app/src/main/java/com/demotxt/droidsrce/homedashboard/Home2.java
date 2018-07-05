@@ -7,6 +7,7 @@ package com.demotxt.droidsrce.homedashboard;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,9 +19,11 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.demotxt.droidsrce.homedashboard.Model.Categorie;
+import com.demotxt.droidsrce.homedashboard.Storage.ShareUtils;
 import com.squareup.okhttp.ResponseBody;
 
 import java.io.File;
@@ -37,8 +40,8 @@ import retrofit.Retrofit;
 
 public class Home2 extends AppCompatActivity {
 
-    String url = "http://167.99.93.137/";
-    String urlComplement = "";
+    String url = "https://ckoipapa.me/";
+    static String urlComplement = "";
     static TextView textview1;
     static TextView textview2;
     static Button ButtonArray;
@@ -52,11 +55,13 @@ public class Home2 extends AppCompatActivity {
         textview2= (TextView) findViewById(R.id.texthome2);
         ButtonArray= (Button) findViewById(R.id.buttonhome);
 
+
         ButtonArray.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getRetrofitCategories();
                 getRetrofitImage();
+
             }
         });
 
@@ -71,37 +76,22 @@ public class Home2 extends AppCompatActivity {
 
         RetrofitImageAPI service = retrofit.create(RetrofitImageAPI.class);
 
-        Call<List<Categorie>> call = service.getCategories();
+        Call<List<Categorie>> call = service.getCategories(ShareUtils.recuperationUser(getApplicationContext()).getToken());
 
-        call.enqueue(new Callback<List<Categorie>>() {
-            @Override
-            public void onResponse(Response<List<Categorie>> response, Retrofit retrofit) {
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
 
-                try {
+        try {
+            List<Categorie> listRepos = call.execute().body();
+            textview1.setText(listRepos.get(0).getTitle());
+            textview2.setText(listRepos.get(0).getDescription());
+            urlComplement = listRepos.get(0).getIllustration().substring(1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-                    Log.d("onResponse", "Response came from server");
-
-                    List<Categorie> listRepos = response.body();
-
-                    Log.d("onResponse", "Response  : "+listRepos.get(0).getIllustration().substring(1));
-                    urlComplement = listRepos.get(0).getIllustration().substring(1);
-                    textview1.setText(listRepos.get(0).getTitle());
-                    textview2.setText(listRepos.get(0).getDescription());
-
-
-                } catch (Exception e) {
-                    Log.d("onResponse", "There is an error");
-                    e.printStackTrace();
-                }
-
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                Log.d("onFailure", t.toString());
-            }
-
-        });
     }
 
     void getRetrofitImage() {
@@ -112,11 +102,16 @@ public class Home2 extends AppCompatActivity {
                 .build();
 
         RetrofitImageAPI service = retrofit.create(RetrofitImageAPI.class);
-        urlComplement = "storage/category/Zoo/lion.jpg";
+        //urlComplement = "storage/category/Zoo/lion.jpg";
         String[] parseUrlComplement = urlComplement.split("/");
-        Call<ResponseBody> call = service.getImageDetails();
+        Log.d("onResponse", "urlComplement : "+ parseUrlComplement[2]);
+        Log.d("onResponse", "urlComplement : "+ parseUrlComplement[3]);
 
-        Log.d("onResponse", "urlComplement : "+ parseUrlComplement[0]);
+        parseUrlComplement[2] =  "Zoo";
+        parseUrlComplement[3] = "lion.jpg";
+        Call<ResponseBody> call = service.getImageDetails(parseUrlComplement[2], parseUrlComplement[3]);
+
+
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -124,7 +119,7 @@ public class Home2 extends AppCompatActivity {
 
                 try {
 
-                    Log.d("onResponse", "Response came from server");
+                    Log.d("onResponseHeader", response.headers().toString());
 
                     boolean FileDownloaded = DownloadImage(response.body());
 
