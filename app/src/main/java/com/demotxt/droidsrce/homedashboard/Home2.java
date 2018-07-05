@@ -11,11 +11,15 @@ import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,6 +34,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.acl.Group;
 import java.util.List;
 
 import retrofit.Call;
@@ -42,57 +47,23 @@ public class Home2 extends AppCompatActivity {
 
     String url = "https://ckoipapa.me/";
     static String urlComplement = "";
-    static TextView textview1;
-    static TextView textview2;
-    static Button ButtonArray;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home2);
 
-        textview1= (TextView) findViewById(R.id.texthome1);
-        textview2= (TextView) findViewById(R.id.texthome2);
-        ButtonArray= (Button) findViewById(R.id.buttonhome);
+
+        RecyclerView recyclerView =(RecyclerView) findViewById(R.id.grouplist_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(new groupListAdapter());
 
 
-        ButtonArray.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getRetrofitCategories();
-                getRetrofitImage();
 
-            }
-        });
 
     }
 
-    void getRetrofitCategories() {
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RetrofitImageAPI service = retrofit.create(RetrofitImageAPI.class);
-
-        Call<List<Categorie>> call = service.getCategories(ShareUtils.recuperationUser(getApplicationContext()).getToken());
-
-        if (android.os.Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
-
-        try {
-            List<Categorie> listRepos = call.execute().body();
-            textview1.setText(listRepos.get(0).getTitle());
-            textview2.setText(listRepos.get(0).getDescription());
-            urlComplement = listRepos.get(0).getIllustration().substring(1);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     void getRetrofitImage() {
 
@@ -185,5 +156,69 @@ public class Home2 extends AppCompatActivity {
         }
     }
 
+    class groupListAdapter extends RecyclerView.Adapter<groupCardHoler>{
 
+        private List<Categorie> listGroup;
+
+        public groupListAdapter(){
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(url)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            RetrofitImageAPI service = retrofit.create(RetrofitImageAPI.class);
+
+            Call<List<Categorie>> call = service.getCategories(ShareUtils.recuperationUser(getApplicationContext()).getToken());
+
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            }
+
+            try {
+                listGroup = call.execute().body();
+                notifyDataSetChanged();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        @Override
+        public groupCardHoler onCreateViewHolder(ViewGroup parent, int viewType) {
+            View cell = LayoutInflater.from(Home2.this).inflate(R.layout.cell_home,parent,false);
+            groupCardHoler holder= new groupCardHoler(cell);
+            return holder;
+        }
+
+        @Override
+        public void onBindViewHolder(groupCardHoler holder, int position) {
+            holder.layoutforGroup(listGroup.get(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            int itemCount = 0;
+            if(listGroup != null){
+                return listGroup.size();
+            }
+            return 0;
+        }
+    }
+    class groupCardHoler extends RecyclerView.ViewHolder{
+
+        TextView textview1;
+        TextView textview2;
+
+        public groupCardHoler(View cell) {
+            super(cell);
+            textview1= (TextView) cell.findViewById(R.id.texthome1);
+            textview2= (TextView) cell.findViewById(R.id.texthome2);
+        }
+
+        public void layoutforGroup(Categorie categorie){
+            textview1.setText(categorie.getDescription());
+        }
+    }
 }
