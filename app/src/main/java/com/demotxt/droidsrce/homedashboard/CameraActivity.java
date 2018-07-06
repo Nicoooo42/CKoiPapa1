@@ -61,17 +61,11 @@ public class CameraActivity extends AppCompatActivity {
         imageView2 = (ImageView) findViewById(R.id.person_photo);
         text = (TextView) findViewById(R.id.person_age);
 
-        Intent i = getIntent();
-
-        // Puis on récupère l'âge donné dans l'autre activité, ou 0 si cet extra n'est pas dans l'intent
-        String age = i.getStringExtra(Home.AGE);
-        Log.d("CameraDemo string", age);
-
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             takePictureButton.setEnabled(false);
             ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE }, 0);
         }
+        takePicture();
     }
 
     @Override
@@ -84,7 +78,7 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    public void takePicture(View view) {
+    public void takePicture() {
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
