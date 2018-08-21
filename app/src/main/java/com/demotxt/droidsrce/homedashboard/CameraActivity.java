@@ -58,7 +58,7 @@ public class CameraActivity extends AppCompatActivity {
 
         takePictureButton = (Button) findViewById(R.id.button_image);
         imageView = (ImageView) findViewById(R.id.imageview);
-        imageView2 = (ImageView) findViewById(R.id.person_photo);
+        imageView2 = (ImageView) findViewById(R.id.photoItem);
         text = (TextView) findViewById(R.id.person_age);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -114,7 +114,7 @@ public class CameraActivity extends AppCompatActivity {
                 File videoFile = new File(file.getPath());
 
                 Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl("http://192.168.0.23:8080/")
+                        .baseUrl("http://172.16.1.43:5000/")
                         .addConverterFactory(GsonConverterFactory.create())
                         .build();
 
