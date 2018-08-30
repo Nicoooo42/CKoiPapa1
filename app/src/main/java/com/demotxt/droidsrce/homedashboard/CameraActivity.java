@@ -28,6 +28,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.demotxt.droidsrce.homedashboard.Model.Categorie;
+import com.demotxt.droidsrce.homedashboard.Model.Prediction;
+import com.demotxt.droidsrce.homedashboard.Storage.ShareUtils;
 import com.google.gson.Gson;
 
 import okhttp3.MediaType;
@@ -45,10 +47,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class CameraActivity extends AppCompatActivity {
 
-    private Button takePictureButton;
-    private ImageView imageView,imageView2;
     private Uri file;
     private TextView text;
+
+    public static String pred = "lion";
 
 
     @Override
@@ -56,16 +58,16 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-        takePictureButton = (Button) findViewById(R.id.button_image);
-        imageView = (ImageView) findViewById(R.id.imageview);
-        imageView2 = (ImageView) findViewById(R.id.photoItem);
-        text = (TextView) findViewById(R.id.person_age);
+        text = (TextView) findViewById(R.id.textView9);
+
+        ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE }, 0);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            takePictureButton.setEnabled(false);
             ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE }, 0);
         }
+
         takePicture();
+
     }
 
     @Override
@@ -73,7 +75,6 @@ public class CameraActivity extends AppCompatActivity {
         if (requestCode == 0) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                     && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                takePictureButton.setEnabled(true);
             }
         }
     }
@@ -109,16 +110,14 @@ public class CameraActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 100) {
             if (resultCode == RESULT_OK) {
-                imageView.setImageURI(file);
+                //imageView.setImageURI(file);
 
                 File videoFile = new File(file.getPath());
 
                 Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl("http://172.16.1.43:5000/")
+                        .baseUrl("http://159.89.25.189:5000/")
                         .addConverterFactory(GsonConverterFactory.create())
                         .build();
-
-
 
                 RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpg"), videoFile);
 
@@ -128,44 +127,33 @@ public class CameraActivity extends AppCompatActivity {
 
                 RetrofitInterface retrofitInterface = retrofit.create(RetrofitInterface.class);
 
-                Call<String> call =  retrofitInterface.uploadImage(body);
+                Call<Prediction> call =  retrofitInterface.uploadImage(body);
 
-                call.enqueue(new Callback<String>() {
+                call.enqueue(new Callback<Prediction>() {
                     @Override
-                    public void onResponse(Call<String> call, retrofit2.Response<String> response) {
+                    public void onResponse(Call<Prediction> call, retrofit2.Response<Prediction> response) {
+                        pred = response.body().getPredictions();
+                        ShareUtils.sauvegarderPrediction(getApplicationContext(), response.body());
 
-                        try {
+                        setContentView(R.layout.activity_objet);
 
-                            Log.d("onResponse", "cool");
+                        Intent camera = new Intent(CameraActivity.this, Object.class);
 
+                        camera.putExtra("ID_Image", pred);
 
-
-                        } catch (Exception e) {
-                            Log.d("onResponse", "marche pas");
-                            e.printStackTrace();
-                        }
-
+                        // Puis on lance l'intent !
+                        startActivity(camera);
                     }
 
                     @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-                        Log.d("onFailure", t.toString());
+                    public void onFailure(Call<Prediction> call, Throwable t) {
+                        Log.d("onFailure6", t.toString());
+                        text.setText("Connection Failed");
                     }
-
-
                 });
-
-
-
-
             }
         }
-        setContentView(R.layout.activity_objet);
 
-        Intent camera = new Intent(CameraActivity.this, Object.class);
-
-        // Puis on lance l'intent !
-        startActivity(camera);
 
     }
 }

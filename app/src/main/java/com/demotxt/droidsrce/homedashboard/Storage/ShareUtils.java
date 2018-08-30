@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.demotxt.droidsrce.homedashboard.Model.User;
+import com.demotxt.droidsrce.homedashboard.Model.Prediction;
 import com.google.gson.Gson;
 
 public class ShareUtils {
 
     public static String FICHIER_XML = "MonFichier.xml";
     public static String CleUser = "User";
+    public static String ClePred = "Prediction";
 
     private static Gson gson = new Gson();
 
@@ -21,6 +23,13 @@ public class ShareUtils {
         editor.apply();
     }
 
+    public static void sauvegarderPrediction(Context context, Prediction prediction){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(FICHIER_XML, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        String json = gson.toJson(prediction);
+        editor.putString(ClePred, json);
+        editor.apply();
+    }
 
     public static User recuperationUser(Context context){
         SharedPreferences sharedPreferences = context.getSharedPreferences(FICHIER_XML, Context.MODE_PRIVATE);
@@ -28,6 +37,16 @@ public class ShareUtils {
 
         if(json != null)
             return gson.fromJson(json, User.class);
+        else
+            return null;
+    }
+
+    public static Prediction recuperationPrediction(Context context){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(FICHIER_XML, Context.MODE_PRIVATE);
+        String json = sharedPreferences.getString(ClePred,null);
+
+        if(json != null)
+            return gson.fromJson(json, Prediction.class);
         else
             return null;
     }

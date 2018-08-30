@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -23,6 +24,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 
 import retrofit.Call;
 import retrofit.Callback;
@@ -33,8 +35,16 @@ import retrofit.Retrofit;
 public class Object extends AppCompatActivity {
 
     String url = "https://ckoipapa.me/";
-    TextView textview1;
+    TextView textview1, textview2;
     ImageView imageView;
+    Button button1;
+
+    TextToSpeech t1;
+    int result;
+
+    public String descr;
+
+    String pred;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +52,46 @@ public class Object extends AppCompatActivity {
         setContentView(R.layout.activity_objet);
 
         textview1= (TextView) findViewById(R.id.person_age);
+        textview2= (TextView) findViewById(R.id.person_name);
         imageView= (ImageView) findViewById(R.id.photoItem);
 
+        textview2.setText("TITRE");
+
+        button1=(Button)findViewById(R.id.BoutonAudio);
+
+        button1.setOnClickListener(new View.OnClickListener(){ // Notre classe anonyme
+            public void onClick(View view){ // et sa méthode !
+                if (view.getId()==R.id.BoutonAudio){
+                    t1.speak(descr,TextToSpeech.QUEUE_FLUSH,null);
+                }
+            }
+        });
+
+        t1=new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status==TextToSpeech.SUCCESS)
+                {
+                    result=t1.setLanguage(Locale.FRANCE);
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(),"Feature not supported in your device",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED)
+        {
+            Toast.makeText(getApplicationContext(),"Feature not supported in your device",Toast.LENGTH_SHORT).show();
+        }
+
+        //pred = ShareUtils.recuperationPrediction(getApplicationContext()).getPredictions();
+        pred = ShareUtils.recuperationPrediction(getApplicationContext()).getPredictions();
+        System.out.println("prediction9 : " +pred);
         getCleApi();
+
+
 
     }
 
@@ -57,7 +104,8 @@ public class Object extends AppCompatActivity {
 
         RetrofitImageAPI service = retrofit.create(RetrofitImageAPI.class);
 
-        Call<Item> call = service.getItem(1);
+
+        Call<Item> call = service.getItem(Transform(pred));
 
 
         call.enqueue(new Callback<Item>() {
@@ -66,8 +114,13 @@ public class Object extends AppCompatActivity {
 
                 if(response.body() != null) {
                     textview1.setText(response.body().getDescription());
+                    textview2.setText(pred);
+                    descr = response.body().getDescription();
 
                     getRetrofitImage(response.body().getIllustration());
+
+                    t1.speak(response.body().getDescription(),TextToSpeech.QUEUE_FLUSH,null);
+
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Objet non trouvé !", Toast.LENGTH_SHORT).show();
@@ -156,6 +209,18 @@ public class Object extends AppCompatActivity {
         }
     }
 
+    public int Transform(String prediction){
+            int valPrep = 0;
 
+            if (prediction.equals("tusker")){
+                return 7;
+            }else if(prediction.equals("lion")){
+                return 4;
+            }else if(prediction.equals("tiger")){
+            return 5;
+            }
+
+            return valPrep;
+    }
 
 }

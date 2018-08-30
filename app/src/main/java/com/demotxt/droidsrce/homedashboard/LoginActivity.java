@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -73,13 +74,20 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login2);
         // Set up the login form.
 
+        if (android.os.Build.VERSION.SDK_INT > 9)
+        {
+            StrictMode.ThreadPolicy policy = new
+                    StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
 
         textMail= (EditText) findViewById(R.id.editEmail);
         textPassword= (EditText) findViewById(R.id.editPassword);
 
         Button button1=(Button)findViewById(R.id.BoutonLogin);
 
-        textMail.setText("nicolas.lamanna2@wanadoo.fr");
+        textMail.setText("client1@gmail.fr");
         textPassword.setText("password");
 
         button1.setOnClickListener(new OnClickListener(){ // Notre classe anonyme
@@ -92,7 +100,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     void getCleApi() {
-
+        System.out.println("Login1");
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -106,7 +114,7 @@ public class LoginActivity extends AppCompatActivity {
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Response<User> response, Retrofit retrofit) {
-
+                System.out.println("Login2");
                 if(response.body() != null) {
                     ShareUtils.sauvegarderUser(getApplicationContext(),response.body());
                     Intent secondeActivite = new Intent(LoginActivity.this, Home2.class);
@@ -118,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Throwable t) {
-                System.out.println("Failure");
+                System.out.println("Failure" +t.toString());
             }
 
         });

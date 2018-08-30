@@ -1,5 +1,7 @@
 package com.demotxt.droidsrce.homedashboard;
 
+import com.demotxt.droidsrce.homedashboard.Model.Prediction;
+
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -12,5 +14,5 @@ import retrofit2.http.Part;
 public interface RetrofitInterface {
     @Multipart
     @POST("/predict")
-    Call<String> uploadImage(@Part MultipartBody.Part image);
+    Call<Prediction> uploadImage(@Part MultipartBody.Part image);
 }
